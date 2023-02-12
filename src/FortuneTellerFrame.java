@@ -1,13 +1,13 @@
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import  java.util.Random;
 
 public class FortuneTellerFrame extends JFrame {
+    int lastChosen = -1;
+    Random rnd = new Random();
+
     JFrame frame;
 
     JPanel mainPnl;
@@ -26,7 +26,8 @@ public class FortuneTellerFrame extends JFrame {
 
     //Change the name of this when copying
     public FortuneTellerFrame() {
-        //frame = new JFrame();
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        frame = new JFrame();
         mainPnl = new JPanel();
         mainPnl.setLayout(new BorderLayout());
 
@@ -39,10 +40,17 @@ public class FortuneTellerFrame extends JFrame {
         bottomPanel();
         mainPnl.add(bottomPnl, BorderLayout.SOUTH);
 
-        add(mainPnl);
-        setSize(500, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+        frame.add(mainPnl);
+
+        Dimension screenSize = kit.getScreenSize();
+        int screenHeight = screenSize.height;
+        int screenWidth = screenSize.width;
+
+        frame.setSize(screenWidth / 2, screenHeight / 2);
+        frame.setLocation(screenWidth / 4, screenHeight / 4);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 
     private void topPanel() {
@@ -50,7 +58,7 @@ public class FortuneTellerFrame extends JFrame {
 
         image = new ImageIcon("src/fortuneOrb.jpg");
         Image conversion = image.getImage();
-        Image scaling = conversion.getScaledInstance(200, 200,  java.awt.Image.SCALE_SMOOTH);
+        Image scaling = conversion.getScaledInstance(150, 150,  java.awt.Image.SCALE_SMOOTH);
         image = new ImageIcon(scaling);
 
         title = new JLabel("Fortune Teller", image, JLabel.CENTER);
@@ -65,7 +73,13 @@ public class FortuneTellerFrame extends JFrame {
     public void middlePanel() {
         midPnl = new JPanel();
 
-        text = new JTextArea(10,50);
+        text = new JTextArea(5,50);
+
+        /* In the case it is necessary to resize the frame (and for screenshot)
+        text = new JTextArea(15, 50);
+         */
+
+        text.setEditable(false);
         scroll = new JScrollPane(text);
         text.setFont(new Font("Comic Sans MS", Font.PLAIN, 11));
 
@@ -80,7 +94,7 @@ public class FortuneTellerFrame extends JFrame {
         bottomPnl.setLayout(new GridLayout(1,2));
 
         fortune = new JButton("Read My Fortune!");
-        fortune.addActionListener((ActionEvent ae) -> {getFortune(text);});
+        fortune.addActionListener((ActionEvent ae) -> getFortune(text));
         fortune.setFont(new Font("Times New Roman", Font.PLAIN, 24));
 
         quit = new JButton("Quit!");
@@ -92,25 +106,38 @@ public class FortuneTellerFrame extends JFrame {
     }
 
     private JTextArea getFortune(JTextArea fortune) {
-        int randMax = 11, randMin = 0;
+        //int randMax = 11, randMin = 0;
 
         ArrayList<String> fortunes = new ArrayList<>();
-        fortunes.add("fortune 1");
-        fortunes.add("fortune 2");
-        fortunes.add("fortune 3");
-        fortunes.add("fortune 4");
-        fortunes.add("fortune 5");
-        fortunes.add("fortune 6");
-        fortunes.add("fortune 7");
-        fortunes.add("fortune 8");
-        fortunes.add("fortune 9");
-        fortunes.add("fortune 10");
-        fortunes.add("fortune 11");
-        fortunes.add("fortune 12");
+        fortunes.add("We don't know about today.");
+        fortunes.add("You might see a duck.");
+        fortunes.add("Oranges. Lots of oranges.");
+        fortunes.add("You will have the worst luck today.");
+        fortunes.add("I would just go to bed.");
+        fortunes.add("You will actually have a good day today.");
+        fortunes.add("Nothing.");
+        fortunes.add("Why are you asking me?");
+        fortunes.add("Maybe something interesting will happen.");
+        fortunes.add("We'll find out together.");
+        fortunes.add("Your next paycheck will disappear.");
+        fortunes.add("You will soon find a useful item.");
 
-        int randomFortune = (int)(Math.random() * (randMax - randMin + 1) + randMin);
 
-        fortune.insert(fortunes.get(randomFortune) + "\n\n", 0);
+        int randomFortune = rnd.nextInt(11); //(int)(Math.random() * (randMax - randMin + 1) + randMin);
+
+
+        while (true) {
+            if (lastChosen == randomFortune) {
+                randomFortune = rnd.nextInt(11);
+            } else {
+                break;
+            }
+        }
+
+        String chosenFortune = fortunes.get(randomFortune);
+        lastChosen = randomFortune;
+
+        fortune.append(chosenFortune + "\n\n");
 
         return fortune;
     }
